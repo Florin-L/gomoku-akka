@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gomoku-akka", "gomoku-akka\gomoku-akka.csproj", "{5132CA73-E20D-4D15-9DCE-30B762B12A46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GomokuGameService", "GomokuGameService\GomokuGameService.csproj", "{9C43D726-6C58-46DD-B7E0-2710DC155FBD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5132CA73-E20D-4D15-9DCE-30B762B12A46} = {5132CA73-E20D-4D15-9DCE-30B762B12A46}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestActors", "TestActors\TestActors.csproj", "{7B925A09-F353-4D4F-BF00-40CD6D39E1B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GomokuClientWinForms", "GomokuClientWinForms\GomokuClientWinForms.csproj", "{40AE9E7C-2A39-456E-9FEA-F304940D9CCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5132CA73-E20D-4D15-9DCE-30B762B12A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5132CA73-E20D-4D15-9DCE-30B762B12A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5132CA73-E20D-4D15-9DCE-30B762B12A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5132CA73-E20D-4D15-9DCE-30B762B12A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C43D726-6C58-46DD-B7E0-2710DC155FBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C43D726-6C58-46DD-B7E0-2710DC155FBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C43D726-6C58-46DD-B7E0-2710DC155FBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C43D726-6C58-46DD-B7E0-2710DC155FBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B925A09-F353-4D4F-BF00-40CD6D39E1B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B925A09-F353-4D4F-BF00-40CD6D39E1B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B925A09-F353-4D4F-BF00-40CD6D39E1B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B925A09-F353-4D4F-BF00-40CD6D39E1B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40AE9E7C-2A39-456E-9FEA-F304940D9CCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40AE9E7C-2A39-456E-9FEA-F304940D9CCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40AE9E7C-2A39-456E-9FEA-F304940D9CCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40AE9E7C-2A39-456E-9FEA-F304940D9CCE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
