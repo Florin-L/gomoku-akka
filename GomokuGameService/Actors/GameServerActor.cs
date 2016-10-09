@@ -45,7 +45,6 @@ namespace Gomoku.Actors
             Receive<ClientConnect>(message => Sender.Tell(new ClientConnected()));
             Receive<Ping>(message => Sender.Tell(new PingResponse()));
 
-            Receive<MoveMade>(message => this.HandleMoveMade(message));
             Receive<MakeMove>(message => this.HandleMakeMove(message));
             Receive<MoveResponse>(message => this.HandleMoveResponse(message));
 

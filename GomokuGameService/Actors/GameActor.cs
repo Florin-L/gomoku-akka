@@ -219,7 +219,6 @@ namespace Gomoku.Actors
 
             //
             Receive<StartGame>(message => this.HandleStartGame(message));
-            Receive<MoveMade>(message => this.HandleMoveMade(message));
             Receive<CancelGame>(message => this.HandleCancelGame(message));
             Receive<GameCancelled>(message => this.HandleGameCancelled(message));
             Receive<MakeMove>(message => this.HandleMakeMove(message));
@@ -267,65 +266,6 @@ namespace Gomoku.Actors
         {
             this.log.Info("Stop the game actor for game {0}", message.Guid);
             Context.Stop(this.Self);
-        }
-
-        /// <summary>
-        /// A player (Human/Computer) made a move.
-        /// </summary>
-        /// <param name="message"></param>
-        private void HandleMoveMade(MoveMade message)
-        {
-            this.board.Set(message.Row, message.Column, message.Player.Symbol);
-
-            IList<Tuple<int, int>> winnigLineCoords = null;
-            var status = GameStatus.Continue;
-            if (this.gameWon)
-            {
-                status = (this.player.Color == PlayerColor.Black) ?
-                    GameStatus.BlackWon : GameStatus.WhiteWon;
-
-                winnigLineCoords = GetWinningLine(message.Row, message.Column);
-            }
-
-            if (this.totalLines <= 0)
-            {
-                // no more possible moves
-                status = GameStatus.Draw;
-            }
-
-            // update the current player only if the game can continue
-            if (status == GameStatus.Continue)
-            {
-                this.player = this.OpponentPlayer(message.Player);
-            }
-
-            //
-            this.gameServer.Tell(
-                new MoveResponse()
-                {
-                    Guid = this.guid,
-                    Player = message.Player,
-                    NextPlayer = this.player,
-                    Row = message.Row,
-                    Column = message.Column,
-                    MoveStatus = MoveStatus.Accepted,
-                    GameStatus = status,
-                    WinningLine = this.winningLine,
-                    WinningLineCoords = winnigLineCoords
-                });
-
-            //
-            if (status != GameStatus.Continue)
-            {
-                // the game is over
-                return;
-            }
-
-            // let the computer play its own turn
-            if (this.player.IsComputer())
-            {
-                this.Think();
-            }
         }
 
         /// <summary>
@@ -533,6 +473,65 @@ namespace Gomoku.Actors
         }
 
         /// <summary>
+        /// A player (Human/Computer) made a move.
+        /// </summary>
+        /// <param name="message"></param>
+        private void OnMoveMade(MoveMade message)
+        {
+            this.board.Set(message.Row, message.Column, message.Player.Symbol);
+
+            IList<Tuple<int, int>> winnigLineCoords = null;
+            var status = GameStatus.Continue;
+            if (this.gameWon)
+            {
+                status = (this.player.Color == PlayerColor.Black) ?
+                    GameStatus.BlackWon : GameStatus.WhiteWon;
+
+                winnigLineCoords = GetWinningLine(message.Row, message.Column);
+            }
+
+            if (this.totalLines <= 0)
+            {
+                // no more possible moves
+                status = GameStatus.Draw;
+            }
+
+            // update the current player only if the game can continue
+            if (status == GameStatus.Continue)
+            {
+                this.player = this.OpponentPlayer(message.Player);
+            }
+
+            //
+            this.gameServer.Tell(
+                new MoveResponse()
+                {
+                    Guid = this.guid,
+                    Player = message.Player,
+                    NextPlayer = this.player,
+                    Row = message.Row,
+                    Column = message.Column,
+                    MoveStatus = MoveStatus.Accepted,
+                    GameStatus = status,
+                    WinningLine = this.winningLine,
+                    WinningLineCoords = winnigLineCoords
+                });
+
+            //
+            if (status != GameStatus.Continue)
+            {
+                // the game is over
+                return;
+            }
+
+            // let the computer play its own turn
+            if (this.player.IsComputer())
+            {
+                this.Think();
+            }
+        }
+
+        /// <summary>
         /// Performs the move for 'player' and updates the variables.
         /// </summary>
         /// <param name="row"></param>
@@ -668,8 +667,7 @@ namespace Gomoku.Actors
             //DumpValues(iPlayer);
 
             //
-            HandleMoveMade(
-                new MoveMade(this.guid, this.player, row, column));
+            OnMoveMade(new MoveMade(this.guid, this.player, row, column));
         }
 
         /// <summary>

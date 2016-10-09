@@ -183,11 +183,16 @@ namespace GomokuClient
         {
             base.OnMouseClick(e);
 
+            var game = (Game)this.DataContext;
+            if (!game.IsRunning)
+            {
+                return;
+            }
+
             var row = e.Y / this.cellSize;
             var column = e.X / this.cellSize;
 
-            var gameContext = (Game)this.DataContext;
-            gameContext.ValidateMove(new GameMove(row, column));
+            game.PlayerMove(new GameMove(row, column));
         }
 
         /// <summary>
@@ -245,7 +250,7 @@ namespace GomokuClient
             var game = this.DataContext as Game;
             if (game.BlackPlayer.IsHuman())
             {
-                game.ValidateMove(new GameMove(this.boardSize / 2, this.boardSize / 2));
+                game.PlayerMove(new GameMove(this.boardSize / 2, this.boardSize / 2));
             }
         }
 

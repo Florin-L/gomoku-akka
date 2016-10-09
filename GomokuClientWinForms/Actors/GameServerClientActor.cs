@@ -41,7 +41,6 @@ namespace GomokuClient.Actors
             Receive<CancelGame>(message => this.HandleCancelGame(message));
             Receive<GameCancelled>(message => this.HandleGameCancelled(message));
 
-            Receive<MoveMade>(message => this.HandleMoveMade(message));
             Receive<Move>(message => this.HandleClientMove(message));
             Receive<MoveResponse>(message => this.HandleMoveResponse(message));
 
@@ -148,29 +147,6 @@ namespace GomokuClient.Actors
 
             // unwatch
             Context.Unwatch(this.gameServiceRef);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        private void HandleMoveMade(MoveMade message)
-        {
-            if (this.isCancelling)
-            {
-                return;
-            }
-
-            if (message.Player.IsComputer())
-            {
-                this.game.OnMove(new GameMove()
-                {
-                    Row = message.Row,
-                    Column = message.Column,
-                    Color = message.Player.Color,
-                });
-            }
         }
 
         /// <summary>

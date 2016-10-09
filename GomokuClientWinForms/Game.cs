@@ -337,6 +337,7 @@ namespace GomokuClient
             this.index = 0;
             this.Moves.Clear();
             this.IsRunning = true;
+            this.Winner = null;
             this.CurrentPlayer = this.BlackPlayer;
             this.GameStarted?.Invoke(this, new GameStartedEventArgs(guid));
         }
@@ -428,7 +429,7 @@ namespace GomokuClient
         /// 
         /// </summary>
         /// <param name="gm"></param>
-        internal void ValidateMove(GameMove gm)
+        internal void PlayerMove(GameMove gm)
         {
             this.GameServiceActor.Tell(
                 new Gomoku.Actors.Client.Move(this.CurrentPlayer, gm.Row, gm.Column));
