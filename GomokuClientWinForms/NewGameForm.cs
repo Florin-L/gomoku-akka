@@ -48,34 +48,14 @@ namespace GomokuClient
 
         private void btnSwitchSides_Click(object sender, EventArgs e)
         {
-            //
             this.whitePlayerName.SelectedIndex = 1;
             this.blackPlayerName.SelectedIndex = 0;
-
-            //
-            var value = this.whiteSearchDepth.Value;
-            this.whiteSearchDepth.Value = this.blackSearchDepth.Value;
-            this.blackSearchDepth.Value = value;
-
-            this.whiteSearchDepth.Enabled = !this.whitePlayerName.SelectedText.Equals("Human");
-            this.blackSearchDepth.Enabled = !this.whiteSearchDepth.Enabled;
-
-            //
-            var value2 = whiteTimeLimit.Value;
-            this.whiteTimeLimit.Value = blackTimeLimit.Value;
-            this.blackTimeLimit.Value = value2;
         }
 
         private void NewGameForm_Load(object sender, EventArgs e)
         {
             this.whitePlayerName.SelectedIndex = 0;
             this.blackPlayerName.SelectedIndex = 1;
-
-            this.whiteSearchDepth.Value = 0;
-            this.blackSearchDepth.Value = 4;
-
-            this.whiteTimeLimit.Value = 0;
-            this.blackTimeLimit.Value = 0;
         }
     }
 }
