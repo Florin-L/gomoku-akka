@@ -27,6 +27,7 @@ namespace GomokuClient
 
             this.game.GameReseted += this.boardCanvas.OnGameReseted;
             this.game.GameStarted += this.boardCanvas.OnGameStarted;
+            this.game.GameOver += this.boardCanvas.OnGameOver;
 
             //
             this.connectionStatusLabel.Text = "Not connected";
@@ -100,6 +101,8 @@ namespace GomokuClient
         /// <param name="e"></param>
         private void OnGameOver(object sender, GameOverEventArgs e)
         {
+            this.game.IsRunning = false;
+
             switch (e.Status)
             {
                 case GameStatus.Draw:

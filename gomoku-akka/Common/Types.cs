@@ -50,6 +50,18 @@ namespace Gomoku.Common
     /// <summary>
     /// 
     /// </summary>
+    public enum WinningLine
+    {
+        None,
+        Horiz,
+        DownLeft,
+        DownRight,
+        Vert
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public class Player
     {
         public string Name { get; set; }

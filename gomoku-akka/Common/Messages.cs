@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using Gomoku.Common;
 using Akka.Actor;
 
@@ -211,13 +212,15 @@ namespace Gomoku.Actors
         public GameStatus GameStatus { get; set; }
         public int Row { get; set; }
         public int Column { get; set; }
+        public WinningLine WinningLine { get; set; }
+        public IList<Tuple<int, int>> WinningLineCoords { get; set; }
 
         public MoveResponse() { }
 
         public MoveResponse(Guid guid,
             Player player, Player nextPlayer,
             int row, int column,
-            MoveStatus moveStatus, GameStatus gameStatus) : base(guid)
+            MoveStatus moveStatus, GameStatus gameStatus, WinningLine winningLine) : base(guid)
         {
             Player = player;
             NextPlayer = nextPlayer;
@@ -225,6 +228,7 @@ namespace Gomoku.Actors
             Column = column;
             MoveStatus = moveStatus;
             GameStatus = gameStatus;
+            WinningLine = winningLine;
         }
     }
 

@@ -6,6 +6,12 @@ using Akka.Actor;
 using Gomoku.Common;
 using System.Threading.Tasks;
 
+//
+// Acknowledge:
+// The (simple) "AI" engine was implemented using the algorithm from:
+// http://www.cise.ufl.edu/~cop4600/cgi-bin/lxr/http/source.cgi/commands/simple/gomoku.c
+//
+
 namespace Gomoku.Actors
 {
     /// <summary>
@@ -122,6 +128,11 @@ namespace Gomoku.Actors
         /// Set if one of the player won.
         /// </summary>
         bool gameWon;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        WinningLine winningLine = WinningLine.None;
 
         /// <summary>
         /// The number of empty lines left.
@@ -259,29 +270,36 @@ namespace Gomoku.Actors
         }
 
         /// <summary>
-        /// 
+        /// A player (Human/Computer) made a move.
         /// </summary>
         /// <param name="message"></param>
         private void HandleMoveMade(MoveMade message)
         {
             this.board.Set(message.Row, message.Column, message.Player.Symbol);
-            //++this.movesCounter;
 
+            IList<Tuple<int, int>> winnigLineCoords = null;
             var status = GameStatus.Continue;
             if (this.gameWon)
             {
                 status = (this.player.Color == PlayerColor.Black) ?
                     GameStatus.BlackWon : GameStatus.WhiteWon;
+
+                winnigLineCoords = GetWinningLine(message.Row, message.Column);
             }
 
             if (this.totalLines <= 0)
             {
+                // no more possible moves
                 status = GameStatus.Draw;
             }
 
-            //
-            this.player = this.OpponentPlayer(message.Player);
+            // update the current player only if the game can continue
+            if (status == GameStatus.Continue)
+            {
+                this.player = this.OpponentPlayer(message.Player);
+            }
 
+            //
             this.gameServer.Tell(
                 new MoveResponse()
                 {
@@ -291,15 +309,19 @@ namespace Gomoku.Actors
                     Row = message.Row,
                     Column = message.Column,
                     MoveStatus = MoveStatus.Accepted,
-                    GameStatus = status
+                    GameStatus = status,
+                    WinningLine = this.winningLine,
+                    WinningLineCoords = winnigLineCoords
                 });
 
+            //
             if (status != GameStatus.Continue)
             {
                 // the game is over
                 return;
             }
 
+            // let the computer play its own turn
             if (this.player.IsComputer())
             {
                 this.Think();
@@ -314,10 +336,12 @@ namespace Gomoku.Actors
         {
             if (message.Player.IsHuman())
             {
+                // handles the human player move
                 PlayerMoved(message.Row, message.Column, message.Player);
             }
             else
             {
+                // handles the computer player move
                 MakeMove(message.Row, message.Column);
                 BrainMoved(message.Row, message.Column, message.Player);
             }
@@ -394,6 +418,74 @@ namespace Gomoku.Actors
         }
 
         /// <summary>
+        /// Retrieves the coordinates of the squares which form the winning line.
+        /// </summary>
+        /// <returns></returns>
+        IList<Tuple<int, int>> GetWinningLine(int row, int column)
+        {
+            log.Debug("GetWinningLine - invoked for row={0} and column={1}", row, column);
+
+            int dirRow = 0;
+            int dirColumn = 0;
+
+            switch (this.winningLine)
+            {
+                case WinningLine.Horiz:
+                    dirColumn = -1;
+                    break;
+
+                case WinningLine.DownLeft:
+                    dirRow = 1;
+                    dirColumn = -1;
+                    break;
+
+                case WinningLine.DownRight:
+                    dirRow = 1;
+                    dirColumn = 1;
+                    break;
+
+                case WinningLine.Vert:
+                    dirRow = 1;
+                    break;
+            }
+
+            //DumpBoard();
+
+            var coords = new List<Tuple<int, int>>();
+
+            var i = row;
+            var j = column;
+
+            // forward direction
+            while ((i > -1) && (i < this.board.Size) &&
+                (j > -1) && (j < this.board.Size) &&
+                (this.board.Get(i, j) == this.player.Symbol))
+            {
+                log.Debug("GetWinningLine - adding {0}, {1}", i, j);
+                coords.Add(new Tuple<int, int>(i, j));
+
+                i += dirRow;
+                j += dirColumn;
+            }
+
+            // backward direction
+            i = row - dirRow;
+            j = column - dirColumn;
+            while ((i > -1) && (i < this.board.Size) &&
+                (j > -1) && (j < this.board.Size) &&
+                (this.board.Get(i, j) == this.player.Symbol))
+            {
+                log.Debug("GetWinningLine - adding {0}, {1}", i, j);
+                coords.Add(new Tuple<int, int>(i, j));
+
+                i -= dirRow;
+                j -= dirColumn;
+            }
+
+            return coords;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="symbol"></param>
@@ -450,6 +542,8 @@ namespace Gomoku.Actors
             var opponent = OpponentPlayer(player);
             var iPlayer = (int)this.player.Color;
 
+            this.winningLine = WinningLine.None;
+
             //DumpLines(iPlayer);
 
             /* Each square of the board is part of 20 different lines. It adds 
@@ -459,7 +553,7 @@ namespace Gomoku.Actors
              */
 
             // Horizontal lines, from left to right.
-            for (int k = 0; k <= 4; ++k)
+            for (int k = 0; k < 5; ++k)
             {
                 var column1 = column - k;   // X
                 var row1 = row;             // Y
@@ -468,21 +562,25 @@ namespace Gomoku.Actors
                 {
                     Add(ref this.line[0][row1][column1][iPlayer]);  // add one to line
 
-                    if (this.gameWon)
+                    if (this.gameWon && (this.winningLine == WinningLine.None))
                     {
-                        log.Info("{0} won", this.player);
+                        log.Info("{0} won - winning line is Horiz", this.player);
+                        this.winningLine = WinningLine.Horiz;
                     }
 
                     // Updates values for the 5 squares in the line.
-                    for (int l = 0; l <= 4; ++l)
+                    for (int l = 0; l < 5; ++l)
                     {
-                        Update(this.line[0][row1][column1], this.value[row1][column1 + l], opponent);
+                        if (column1 + l < this.board.Size - 4)
+                        {
+                            Update(this.line[0][row1][column1], this.value[row1][column1 + l], opponent);
+                        }
                     }
                 }
             }
 
             // Diagonal lines, from lower left to upper right.
-            for (int k = 0; k <= 4; ++k)
+            for (int k = 0; k < 5; ++k)
             {
                 var column1 = column - k;   // X
                 var row1 = row + k;         // Y
@@ -492,22 +590,26 @@ namespace Gomoku.Actors
                 {
                     Add(ref this.line[1][row1][column1][iPlayer]);
 
-                    if (this.gameWon)
+                    if (this.gameWon && (this.winningLine == WinningLine.None))
                     {
-                        log.Info("{0} won", this.player);
+                        log.Info("{0} won - winning line is DownLeft", this.player);
+                        this.winningLine = WinningLine.DownLeft;
                     }
 
-                    for (int l = 0; l <= 4; ++l)
+                    for (int l = 0; l < 5; ++l)
                     {
-                        Update(this.line[1][row1][column1],
-                            this.value[row1 - l][column1 + l], opponent);
+                        if ((row1 - l >= 0) && (column1 + l < this.board.Size - 4))
+                        {
+                            Update(this.line[1][row1][column1],
+                                this.value[row1 - l][column1 + l], opponent);
+                        }
                     }
 
                 }
             }
 
             // Diagonal lines, down right to upper left.
-            for (int k = 0; k <= 4; ++k)
+            for (int k = 0; k < 5; ++k)
             {
                 var column1 = column + k;
                 var row1 = row + k;
@@ -517,22 +619,26 @@ namespace Gomoku.Actors
                 {
                     Add(ref this.line[3][row1][column1][iPlayer]);
 
-                    if (this.gameWon)
+                    if (this.gameWon && (this.winningLine == WinningLine.None))
                     {
-                        log.Info("{0} won", this.player);
+                        log.Info("{0} won - winning line is DownRight", this.player);
+                        this.winningLine = WinningLine.DownRight;
                     }
 
-                    for (int l = 0; l <= 4; ++l)
+                    for (int l = 0; l < 5; ++l)
                     {
-                        Update(this.line[3][row1][column1],
-                            this.value[row1 - l][column1 - l], opponent);
+                        if ((row1 - l >= 0) && (column1 - l >= 0))
+                        {
+                            Update(this.line[3][row1][column1],
+                                this.value[row1 - l][column1 - l], opponent);
+                        }
                     }
 
                 }
             }
 
             // Vertical lines, from down to up
-            for (int k = 0; k <= 4; ++k)
+            for (int k = 0; k < 5; ++k)
             {
                 var column1 = column;
                 var row1 = row + k;
@@ -541,15 +647,19 @@ namespace Gomoku.Actors
                 {
                     Add(ref this.line[2][row1][column1][iPlayer]);
 
-                    if (this.gameWon)
+                    if (this.gameWon && (this.winningLine == WinningLine.None))
                     {
-                        log.Info("{0} won", this.player);
+                        log.Info("{0} won - winning line is Vert", this.player);
+                        this.winningLine = WinningLine.Vert;
                     }
 
-                    for (int l = 0; l <= 4; ++l)
+                    for (int l = 0; l < 5; ++l)
                     {
-                        Update(this.line[2][row1][column1],
-                            this.value[row1 - l][column1], opponent);
+                        if (row1 - l >= 0)
+                        {
+                            Update(this.line[2][row1][column1],
+                                this.value[row1 - l][column1], opponent);
+                        }
                     }
                 }
             }
@@ -677,6 +787,31 @@ namespace Gomoku.Actors
             });
         }
 
+        #region Debug methods
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DumpBoard()
+        {
+            log.Debug("Board:");
+
+            for (int i = 0; i < this.board.Size; ++i)
+            {
+                var sb = new System.Text.StringBuilder();
+                for (int j = 0; j < this.board.Size; ++j)
+                {
+                    sb.AppendFormat("{0} ",
+                        this.board.IsEmpty(i, j) ? '_' : this.board.Get(i, j));
+                }
+                log.Debug(sb.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
         private void DumpLines(int player)
         {
             log.Debug("Lines for player {0}", player);
@@ -695,6 +830,10 @@ namespace Gomoku.Actors
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="player"></param>
         private void DumpValues(int player)
         {
             log.Debug("Values for player {0}", player);
@@ -708,5 +847,7 @@ namespace Gomoku.Actors
                 log.Debug(sb.ToString());
             }
         }
+
+        #endregion
     }
 }

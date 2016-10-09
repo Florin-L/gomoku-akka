@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using NLog;
+
 namespace GomokuClient
 {
     public partial class BoardCanvas : Panel
@@ -90,8 +92,14 @@ namespace GomokuClient
         Rectangle pieceRect;
         Rectangle whitePieceRect;
         Rectangle blackPieceRect;
-        
+
         #endregion
+
+        List<GameMove> winningLine;
+        Timer blinkTimer;
+        bool changed;
+
+        Logger log = LogManager.GetCurrentClassLogger();
 
         int cellSize = 24;
         int boardSize = 19;
@@ -103,6 +111,13 @@ namespace GomokuClient
         {
             this.DoubleBuffered = true;
             this.InitializeComponent();
+
+            //
+            this.changed = false;
+            this.blinkTimer = new Timer();
+            this.blinkTimer.Interval = 300;
+
+            this.blinkTimer.Tick += OnBlinkTime;
 
             //
             this.atlasImages = Properties.Resources.HGarden;
@@ -205,8 +220,16 @@ namespace GomokuClient
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void OnGameReseted(object sender, EventArgs e)
+        internal void OnGameReseted(object sender, EventArgs e)
         {
+            this.blinkTimer.Stop();
+
+            if (this.winningLine != null)
+            {
+                this.winningLine.Clear();
+                this.winningLine = null;
+            }
+
             this.Refresh();
         }
 
@@ -224,6 +247,56 @@ namespace GomokuClient
             {
                 game.ValidateMove(new GameMove(this.boardSize / 2, this.boardSize / 2));
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        internal void OnGameOver(object sender, GameOverEventArgs e)
+        {
+            if (e.WinningLineCoords != null)
+            {
+                var game = (Game)this.DataContext;
+
+                this.winningLine = new List<GameMove>();
+                foreach (var t in e.WinningLineCoords)
+                {
+                    this.winningLine.Add(new GameMove()
+                    {
+                        Row = t.Item1,
+                        Column = t.Item2,
+                        Color = game.Winner.Color
+                    });
+                }
+
+                // blink the pieces
+                this.blinkTimer.Start();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnBlinkTime(object sender, EventArgs e)
+        {
+            var game = (Game)this.DataContext;
+            foreach (var gm in this.winningLine)
+            {
+                if (!changed)
+                {
+                    game.Moves.Remove(gm);
+                }
+                else
+                {
+                    game.Moves.Add(gm);
+                }
+            }
+            changed = !changed;
+            this.Refresh();
         }
 
         #endregion

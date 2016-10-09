@@ -159,12 +159,26 @@ namespace GomokuClient
     internal class GameOverEventArgs : EventArgs
     {
         public GameStatus Status { get; set; }
+        public Player Winner { get; set; }
+        public WinningLine WinningLine { get; set; }
+        public IList<Tuple<int, int>> WinningLineCoords { get; set; }
+        public int Row { get; set; }
+        public int Column { get; set; }
 
-        public GameOverEventArgs() { }
+        public GameOverEventArgs()
+        {
+            WinningLine = WinningLine.None;
+            WinningLineCoords = null;
+            Winner = null;
+        }
 
-        public GameOverEventArgs(GameStatus status)
+        public GameOverEventArgs(GameStatus status, WinningLine winningLine, 
+            int row, int column) : this()
         {
             this.Status = status;
+            this.WinningLine = winningLine;
+            this.Row = row;
+            this.Column = column;
         }
     }
 
@@ -206,6 +220,33 @@ namespace GomokuClient
             this.Row = row;
             this.Column = column;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var that = (GameMove)obj;
+            return (this.Row == that.Row) && 
+                (this.Column == that.Column) && 
+                (this.Color == that.Color);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
     /// <summary>
@@ -227,6 +268,7 @@ namespace GomokuClient
         public Player WhitePlayer { get; set; }
         public Player BlackPlayer { get; set; }
         public Player CurrentPlayer { get; set; }
+        public Player Winner { get; set; }
         internal List<GameMove> Moves { get; set; }
         public bool IsRunning { get; set; }
         public GameStatus Status { get; set; }
@@ -320,10 +362,20 @@ namespace GomokuClient
 
                 //
                 this.Status = response.GameStatus;
+                this.Winner = response.Player;
 
                 if (response.GameStatus != GameStatus.Continue)
                 {
-                    this.GameOver?.Invoke(this, new GameOverEventArgs(response.GameStatus));
+                    this.GameOver?.Invoke(this,
+                        new GameOverEventArgs()
+                        {
+                            Status = this.Status,
+                            Winner = this.Winner,
+                            WinningLine = response.WinningLine,
+                            WinningLineCoords = response.WinningLineCoords,
+                            Row = response.Row,
+                            Column = response.Column
+                        });
                 }
             }
         }
@@ -424,7 +476,8 @@ namespace GomokuClient
         /// </summary>
         internal void OnStartThinking()
         {
-            this.StartThinking?.Invoke(this, new StartThinkingEventArgs() { PlayerName = GetComputerPlayer().Name });
+            this.StartThinking?.Invoke(this, 
+                new StartThinkingEventArgs() { PlayerName = GetComputerPlayer().Name });
         }
 
         /// <summary>
