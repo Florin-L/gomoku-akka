@@ -5,6 +5,7 @@ using NLog;
 using Akka.Actor;
 using Gomoku.Common;
 using System.Threading.Tasks;
+using System.Threading;
 
 //
 // Acknowledge:
@@ -159,6 +160,11 @@ namespace Gomoku.Actors
         /// </summary>
         int[][][][] line;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        CancellationTokenSource tokenSource;
+
         #endregion
 
         /// <summary>
@@ -178,6 +184,9 @@ namespace Gomoku.Actors
 
             this.white = white;
             this.black = black;
+
+            //
+            this.tokenSource = new CancellationTokenSource();
 
             // Black moves first
             this.player = this.black;
@@ -220,7 +229,6 @@ namespace Gomoku.Actors
             //
             Receive<StartGame>(message => this.HandleStartGame(message));
             Receive<CancelGame>(message => this.HandleCancelGame(message));
-            Receive<GameCancelled>(message => this.HandleGameCancelled(message));
             Receive<MakeMove>(message => this.HandleMakeMove(message));
         }
 
@@ -255,15 +263,8 @@ namespace Gomoku.Actors
         /// <param name="message"></param>
         private void HandleCancelGame(CancelGame message)
         {
-            this.gameServer.Tell(message);
-        }
+            this.tokenSource.Cancel();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
-        private void HandleGameCancelled(GameCancelled message)
-        {
             this.log.Info("Stop the game actor for game {0}", message.Guid);
             Context.Stop(this.Self);
         }
@@ -307,11 +308,18 @@ namespace Gomoku.Actors
             //
             this.gameServer.Tell(new StartThinking() { Guid = this.guid });
 
+            var token = this.tokenSource.Token;
             Task.Run(async () =>
             {
-                var t = await FindMove();
+                var t = await FindMove(token);
+
+                if (token.IsCancellationRequested)
+                {
+                    token.ThrowIfCancellationRequested();
+                }
+
                 return new MakeMove(this.guid, this.player, t.Item1, t.Item2);
-            }).PipeTo(Self);
+            }, token).PipeTo(Self);
         }
 
         /// <summary>
@@ -536,6 +544,7 @@ namespace Gomoku.Actors
         /// </summary>
         /// <param name="row"></param>
         /// <param name="column"></param>
+        /// <param name="ctoken"></param>
         void MakeMove(int row, int column)
         {
             var opponent = OpponentPlayer(player);
@@ -731,7 +740,7 @@ namespace Gomoku.Actors
         /// </summary>
         /// <param name="row"></param>
         /// <param name="column"></param>
-        Task<Tuple<int, int>> FindMove()
+        Task<Tuple<int, int>> FindMove(CancellationToken ctoken)
         {
             return Task.Run(() =>
             {
@@ -763,8 +772,20 @@ namespace Gomoku.Actors
                 // For all empty squares.
                 for (int i = 0; i < this.board.Size; ++i)
                 {
+                    if (ctoken.IsCancellationRequested)
+                    {
+                        log.Debug("FindMove was cancelled !");
+                        ctoken.ThrowIfCancellationRequested();
+                    }
+
                     for (int j = 0; j < this.board.Size; ++j)
                     {
+                        if (ctoken.IsCancellationRequested)
+                        {
+                            log.Debug("FindMove was cancelled !");
+                            ctoken.ThrowIfCancellationRequested();
+                        }
+
                         if (this.board.IsEmpty(i, j))
                         {
                             // compute evaluation

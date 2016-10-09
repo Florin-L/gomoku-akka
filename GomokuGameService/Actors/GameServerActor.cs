@@ -142,10 +142,12 @@ namespace Gomoku.Actors
 
             if (actors != null)
             {
+                actors.GameActorRef.Tell(new CancelGame(message.Guid));
+
                 this.games.Remove(message.Guid);
                 this.log.Info("Game {0} has been removed from map.", message.Guid);
 
-                actors.GameActorRef.Tell(new GameCancelled(message.Guid));
+                actors.ClientActorRef.Tell(new GameCancelled(message.Guid));
             }
         }
 

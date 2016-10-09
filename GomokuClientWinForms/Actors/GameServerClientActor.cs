@@ -121,6 +121,7 @@ namespace GomokuClient.Actors
         /// <returns></returns>
         private void HandleGameStarted(GameStarted message)
         {
+            this.isCancelling = false;
             this.game.OnGameStarted(message.Guid);
         }
 
