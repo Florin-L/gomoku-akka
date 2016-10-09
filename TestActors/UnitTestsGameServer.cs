@@ -43,7 +43,7 @@ namespace TestActors
 
             var createGame = new CreateGame(size: 15,
                 white: new HumanPlayer("white", PlayerColor.White),
-                black: new ComputerPlayer("black", PlayerColor.Black, 2));
+                black: new ComputerPlayer("black", PlayerColor.Black));
 
             serverActorRef.Tell(createGame, TestActor);
             var answer = ExpectMsg<CreateGameResponse>().Guid;
@@ -57,7 +57,7 @@ namespace TestActors
             Assert.IsNotNull(serverActorRef);
 
             var createGame = new CreateGame(size: 15,
-                white: new ComputerPlayer("white", PlayerColor.White, 4),
+                white: new ComputerPlayer("white", PlayerColor.White),
                 black: new HumanPlayer("black", PlayerColor.Black));
 
             serverActorRef.Tell(createGame, TestActor);
@@ -76,7 +76,7 @@ namespace TestActors
             Assert.IsNotNull(serverActorRef);
 
             var createGame = new CreateGame(size: 15,
-                white: new ComputerPlayer("white", PlayerColor.White, 2),
+                white: new ComputerPlayer("white", PlayerColor.White),
                 black: new HumanPlayer("black", PlayerColor.Black));
 
             serverActorRef.Tell(createGame, TestActor);
@@ -92,7 +92,7 @@ namespace TestActors
 
             var createGame = new CreateGame(size: 15,
                 white: new HumanPlayer("white", PlayerColor.White),
-                black: new ComputerPlayer("black", PlayerColor.Black, 2));
+                black: new ComputerPlayer("black", PlayerColor.Black));
 
             serverActorRef.Tell(createGame, TestActor);
             var answer = ExpectMsg<CreateGameResponse>();
@@ -117,7 +117,7 @@ namespace TestActors
 
             var createGame = new CreateGame(size: 19,
                 white: player,
-                black: new ComputerPlayer("black", PlayerColor.Black, 2));
+                black: new ComputerPlayer("black", PlayerColor.Black));
 
             serverActorRef.Tell(createGame, TestActor);
             var answer = ExpectMsg<CreateGameResponse>();
@@ -149,7 +149,7 @@ namespace TestActors
 
             var createGame = new CreateGame(size: 19,
                 white: player,
-                black: new ComputerPlayer("black", PlayerColor.Black, 2));
+                black: new ComputerPlayer("black", PlayerColor.Black));
 
             serverActorRef.Tell(createGame, TestActor);
             var answer = ExpectMsg<CreateGameResponse>();
@@ -181,7 +181,7 @@ namespace TestActors
             var createGame = new CreateGame()
             {
                 Size = 19,
-                White = new ComputerPlayer("white", PlayerColor.White, 2),
+                White = new ComputerPlayer("white", PlayerColor.White),
                 Black = player
             };
 
@@ -212,7 +212,7 @@ namespace TestActors
             var player = new HumanPlayer("black", PlayerColor.Black);
 
             var createGame = new CreateGame(size: 19,
-                white: new ComputerPlayer("white", PlayerColor.White, 2),
+                white: new ComputerPlayer("white", PlayerColor.White),
                 black: player);
 
             serverActorRef.Tell(createGame, TestActor);

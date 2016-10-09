@@ -21,7 +21,7 @@ namespace GomokuClient
             InitializeComponent();
 
             this.WhitePlayer = new HumanPlayer("Human", PlayerColor.White);
-            this.BlackPlayer = new ComputerPlayer("Computer", PlayerColor.Black, 4);
+            this.BlackPlayer = new ComputerPlayer("Computer", PlayerColor.Black);
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

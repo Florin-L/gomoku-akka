@@ -16,7 +16,7 @@ namespace GomokuClient
             this.game = new Game();
 
             this.game.WhitePlayer = new HumanPlayer("White", PlayerColor.White);
-            this.game.BlackPlayer = new ComputerPlayer("Black", PlayerColor.Black, 1);
+            this.game.BlackPlayer = new ComputerPlayer("Black", PlayerColor.Black);
             this.game.CurrentPlayer = this.game.BlackPlayer;
             this.game.BoardSize = this.boardCanvas.BoardSize;
 
@@ -158,8 +158,6 @@ namespace GomokuClient
                     Name = form.WhitePlayer.Name,
                     Color = PlayerColor.White,
                     Type = form.WhitePlayer.Type,
-                    SearchDepth = form.WhitePlayer.SearchDepth,
-                    TimeLimit = form.WhitePlayer.TimeLimit
                 };
 
                 this.game.BlackPlayer = new Player()
@@ -167,8 +165,6 @@ namespace GomokuClient
                     Name = form.BlackPlayer.Name,
                     Color = PlayerColor.Black,
                     Type = form.BlackPlayer.Type,
-                    SearchDepth = form.BlackPlayer.SearchDepth,
-                    TimeLimit = form.BlackPlayer.TimeLimit
                 };
 
                 //

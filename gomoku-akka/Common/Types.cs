@@ -67,8 +67,6 @@ namespace Gomoku.Common
         public string Name { get; set; }
         public PlayerColor Color { get; set; }
         public PlayerType Type { get; set; }
-        public int SearchDepth { get; set; }
-        public int TimeLimit { get; set; }
 
         public char Symbol
         {
@@ -80,13 +78,11 @@ namespace Gomoku.Common
 
         public Player() { }
 
-        public Player(string name, PlayerType type, PlayerColor color, int searchDepth, int timeLimit)
+        public Player(string name, PlayerType type, PlayerColor color)
         {
             this.Name = name;
             this.Type = type;
             this.Color = color;
-            this.SearchDepth = searchDepth;
-            this.TimeLimit = timeLimit;
         }
 
         public bool IsComputer()
@@ -130,8 +126,8 @@ namespace Gomoku.Common
     {
         public HumanPlayer() { }
 
-        public HumanPlayer(string name, PlayerColor color, int timeLimit = 0)
-            : base(name, PlayerType.Human, color, 0, timeLimit)
+        public HumanPlayer(string name, PlayerColor color)
+            : base(name, PlayerType.Human, color)
         { }
     }
 
@@ -142,8 +138,8 @@ namespace Gomoku.Common
     {
         public ComputerPlayer() { }
 
-        public ComputerPlayer(string name, PlayerColor color, int searchDepth = 4, int timeLimit = 0)
-            : base(name, PlayerType.Computer, color, searchDepth, timeLimit)
+        public ComputerPlayer(string name, PlayerColor color)
+            : base(name, PlayerType.Computer, color)
         {
         }
     }

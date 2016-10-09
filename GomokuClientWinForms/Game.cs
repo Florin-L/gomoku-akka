@@ -404,8 +404,7 @@ namespace GomokuClient
             this.PlayerChanged?.Invoke(this,
                 new PlayerChangedEventArgs(
                     new Player(
-                        CurrentPlayer.Name, CurrentPlayer.Type, CurrentPlayer.Color, 
-                        CurrentPlayer.SearchDepth, CurrentPlayer.TimeLimit)));
+                        CurrentPlayer.Name, CurrentPlayer.Type, CurrentPlayer.Color)));
         }
 
         /// <summary>
@@ -458,8 +457,7 @@ namespace GomokuClient
             this.PlayerChanged?.Invoke(this,
                 new PlayerChangedEventArgs(
                     new Player(
-                        this.CurrentPlayer.Name, this.CurrentPlayer.Type, this.CurrentPlayer.Color,
-                        this.CurrentPlayer.SearchDepth, this.CurrentPlayer.TimeLimit)));
+                        this.CurrentPlayer.Name, this.CurrentPlayer.Type, this.CurrentPlayer.Color)));
         }
 
         /// <summary>
