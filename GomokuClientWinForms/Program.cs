@@ -40,7 +40,7 @@ namespace GomokuClient
                             transport-class =
                                 ""Akka.Remote.Transport.Helios.HeliosTcpTransport, Akka.Remote""
                             transport-protocol = tcp
-                            port = 9001
+                            port = 0
                             hostname = localhost
                             tcp-keepalive = on
                         }
