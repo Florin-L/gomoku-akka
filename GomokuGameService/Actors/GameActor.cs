@@ -253,7 +253,7 @@ namespace Gomoku.Actors
                 var row = this.board.Size / 2;
                 var column = row;
 
-                MakeMove(row, column);
+                MakeMove(row, column, this.tokenSource.Token);
             }
         }
 
@@ -283,7 +283,7 @@ namespace Gomoku.Actors
             else
             {
                 // handles the computer player move
-                MakeMove(message.Row, message.Column);
+                MakeMove(message.Row, message.Column, this.tokenSource.Token);
                 BrainMoved(message.Row, message.Column, message.Player);
             }
         }
@@ -466,7 +466,7 @@ namespace Gomoku.Actors
                 return;
             }
 
-            MakeMove(row, column);
+            MakeMove(row, column, this.tokenSource.Token);
         }
 
         /// <summary>
@@ -545,7 +545,7 @@ namespace Gomoku.Actors
         /// <param name="row"></param>
         /// <param name="column"></param>
         /// <param name="ctoken"></param>
-        void MakeMove(int row, int column)
+        void MakeMove(int row, int column, CancellationToken token)
         {
             var opponent = OpponentPlayer(player);
             var iPlayer = (int)this.player.Color;
@@ -563,6 +563,12 @@ namespace Gomoku.Actors
             // Horizontal lines, from left to right.
             for (int k = 0; k < 5; ++k)
             {
+                if (token.IsCancellationRequested)
+                {
+                    log.Debug("MakeMove was interrupted due to a cancellation request");
+                    break;
+                }
+
                 var column1 = column - k;   // X
                 var row1 = row;             // Y
 
@@ -579,6 +585,12 @@ namespace Gomoku.Actors
                     // Updates values for the 5 squares in the line.
                     for (int l = 0; l < 5; ++l)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            log.Debug("MakeMove was interrupted due to a cancellation request");
+                            break;
+                        }
+
                         if (column1 + l < this.board.Size - 4)
                         {
                             Update(this.line[0][row1][column1], this.value[row1][column1 + l], opponent);
@@ -590,6 +602,12 @@ namespace Gomoku.Actors
             // Diagonal lines, from lower left to upper right.
             for (int k = 0; k < 5; ++k)
             {
+                if (token.IsCancellationRequested)
+                {
+                    log.Debug("MakeMove was interrupted due to a cancellation request");
+                    break;
+                }
+
                 var column1 = column - k;   // X
                 var row1 = row + k;         // Y
 
@@ -606,6 +624,12 @@ namespace Gomoku.Actors
 
                     for (int l = 0; l < 5; ++l)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            log.Debug("MakeMove was interrupted due to a cancellation request");
+                            break;
+                        }
+
                         if ((row1 - l >= 0) && (column1 + l < this.board.Size - 4))
                         {
                             Update(this.line[1][row1][column1],
@@ -619,6 +643,12 @@ namespace Gomoku.Actors
             // Diagonal lines, down right to upper left.
             for (int k = 0; k < 5; ++k)
             {
+                if (token.IsCancellationRequested)
+                {
+                    log.Debug("MakeMove was interrupted due to a cancellation request");
+                    break;
+                }
+
                 var column1 = column + k;
                 var row1 = row + k;
 
@@ -635,6 +665,12 @@ namespace Gomoku.Actors
 
                     for (int l = 0; l < 5; ++l)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            log.Debug("MakeMove was interrupted due to a cancellation request");
+                            break;
+                        }
+
                         if ((row1 - l >= 0) && (column1 - l >= 0))
                         {
                             Update(this.line[3][row1][column1],
@@ -648,6 +684,12 @@ namespace Gomoku.Actors
             // Vertical lines, from down to up
             for (int k = 0; k < 5; ++k)
             {
+                if (token.IsCancellationRequested)
+                {
+                    log.Debug("MakeMove was interrupted due to a cancellation request");
+                    break;
+                }
+
                 var column1 = column;
                 var row1 = row + k;
 
@@ -663,6 +705,12 @@ namespace Gomoku.Actors
 
                     for (int l = 0; l < 5; ++l)
                     {
+                        if (token.IsCancellationRequested)
+                        {
+                            log.Debug("MakeMove was interrupted due to a cancellation request");
+                            break;
+                        }
+
                         if (row1 - l >= 0)
                         {
                             Update(this.line[2][row1][column1],
@@ -698,6 +746,7 @@ namespace Gomoku.Actors
             /* The game is won if there are 5 in line. */
             if (num == 5)
             {
+                log.Debug("Add - game won by {0}", this.player);
                 this.gameWon = true;
             }
         }
@@ -775,7 +824,7 @@ namespace Gomoku.Actors
                     if (ctoken.IsCancellationRequested)
                     {
                         log.Debug("FindMove was cancelled !");
-                        ctoken.ThrowIfCancellationRequested();
+                        break;
                     }
 
                     for (int j = 0; j < this.board.Size; ++j)
@@ -783,7 +832,7 @@ namespace Gomoku.Actors
                         if (ctoken.IsCancellationRequested)
                         {
                             log.Debug("FindMove was cancelled !");
-                            ctoken.ThrowIfCancellationRequested();
+                            break;
                         }
 
                         if (this.board.IsEmpty(i, j))

@@ -92,6 +92,7 @@ namespace GomokuClient
         /// <param name="e"></param>
         private void OnGameStarted(object sender, GameStartedEventArgs e)
         {
+            this.gameStatusLabel.Text = "";
         }
 
         /// <summary>
@@ -107,14 +108,17 @@ namespace GomokuClient
             {
                 case GameStatus.Draw:
                     MessageBox.Show("It's a draw");
+                    this.gameStatusLabel.Text = "Draw !";
                     break;
 
                 case GameStatus.WhiteWon:
                     MessageBox.Show("White won !");
+                    this.gameStatusLabel.Text = "White won !";
                     break;
 
                 case GameStatus.BlackWon:
                     MessageBox.Show("Black won !");
+                    this.gameStatusLabel.Text = "Black won !";
                     break;
             }
         }
@@ -201,6 +205,11 @@ namespace GomokuClient
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void showNumbersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

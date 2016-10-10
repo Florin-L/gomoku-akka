@@ -27,7 +27,7 @@ namespace Gomoku.Actors
         PlayerColor playerColor;
 
         /* The number of Empty lines left */
-        int totalLines = 0;
+        //int totalLines;
 
         /* Importance of attack (1..16) */
         int attackFactor;
@@ -48,7 +48,7 @@ namespace Gomoku.Actors
         public SimpleBrainActor()
         {
             this.board = null;
-            this.totalLines = 0;
+            //this.totalLines = 0;
             this.attackFactor = 4;
 
             Receive<StartThink>(m => HandleStartThink(m));
