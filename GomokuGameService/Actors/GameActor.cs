@@ -263,10 +263,18 @@ namespace Gomoku.Actors
         /// <param name="message"></param>
         private void HandleCancelGame(CancelGame message)
         {
+            // cancel all the pending operations (make/find move)
             this.tokenSource.Cancel();
 
+            //
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+
+            // stop this actor
             this.log.Info("Stop the game actor for game {0}", message.Guid);
             Context.Stop(this.Self);
+
+            //
+            this.tokenSource.Dispose();
         }
 
         /// <summary>
@@ -552,7 +560,8 @@ namespace Gomoku.Actors
 
             this.winningLine = WinningLine.None;
 
-            //DumpLines(iPlayer);
+            log.Debug("Dump lines for player {0} before move", player);
+            DumpLines(iPlayer);
 
             /* Each square of the board is part of 20 different lines. It adds 
              * one to the number of pieces in each of these lines. Then it
@@ -720,8 +729,9 @@ namespace Gomoku.Actors
                 }
             }
 
-            //DumpLines(iPlayer);
-            //DumpValues(iPlayer);
+            log.Debug("Dump lines and values for player {0} after move", player);
+            DumpLines(iPlayer);
+            DumpValues(iPlayer);
 
             //
             OnMoveMade(new MoveMade(this.guid, this.player, row, column));
@@ -754,8 +764,8 @@ namespace Gomoku.Actors
         /// <summary>
         /// Updates the value of a square for each player, taking into
         /// account that player has placed an extra piece in the square.
-        /// The value of a square in a usable line is this.weight[line[this.player]+1]
-        /// where line[this.player] is the number of pieces already placed.
+        /// The value of a square in a usable line is "this.weight[line[this.player]+1]"
+        /// where "line[this.player]" is the number of pieces already placed.
         /// </summary>
         /// <param name="line"></param>
         /// <param name="value"></param>
@@ -824,7 +834,7 @@ namespace Gomoku.Actors
                     if (ctoken.IsCancellationRequested)
                     {
                         log.Debug("FindMove was cancelled !");
-                        break;
+                        ctoken.ThrowIfCancellationRequested();
                     }
 
                     for (int j = 0; j < this.board.Size; ++j)
@@ -832,7 +842,7 @@ namespace Gomoku.Actors
                         if (ctoken.IsCancellationRequested)
                         {
                             log.Debug("FindMove was cancelled !");
-                            break;
+                            ctoken.ThrowIfCancellationRequested();
                         }
 
                         if (this.board.IsEmpty(i, j))

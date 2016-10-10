@@ -32,12 +32,14 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.connectionStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.playerThink = new System.Windows.Forms.ToolStripStatusLabel();
+            this.gameStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.computerColorPanel = new System.Windows.Forms.Panel();
             this.playerBlackLabel = new System.Windows.Forms.Label();
             this.playerOneColorPanel = new System.Windows.Forms.Panel();
             this.playerWhiteLabel = new System.Windows.Forms.Label();
             this.turnPicture = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.boardCanvas = new GomokuClient.BoardCanvas();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.gameToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,9 +47,6 @@
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.showNumbersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.gameStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.boardCanvas = new GomokuClient.BoardCanvas();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
@@ -89,8 +88,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.connectionStatusLabel,
             this.playerThink,
-            this.gameStatusLabel,
-            this.toolStripStatusLabel1});
+            this.gameStatusLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 533);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(489, 22);
@@ -107,6 +105,13 @@
             // 
             this.playerThink.Name = "playerThink";
             this.playerThink.Size = new System.Drawing.Size(0, 17);
+            // 
+            // gameStatusLabel
+            // 
+            this.gameStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.gameStatusLabel.Name = "gameStatusLabel";
+            this.gameStatusLabel.Size = new System.Drawing.Size(0, 17);
+            this.gameStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // computerColorPanel
             // 
@@ -162,6 +167,15 @@
             this.label1.TabIndex = 5;
             this.label1.Text = "Turn";
             // 
+            // boardCanvas
+            // 
+            this.boardCanvas.DataContext = null;
+            this.boardCanvas.Location = new System.Drawing.Point(14, 30);
+            this.boardCanvas.Margin = new System.Windows.Forms.Padding(10);
+            this.boardCanvas.Name = "boardCanvas";
+            this.boardCanvas.Size = new System.Drawing.Size(460, 461);
+            this.boardCanvas.TabIndex = 4;
+            // 
             // menuStrip1
             // 
             this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
@@ -188,7 +202,7 @@
             // 
             this.newToolStripMenuItem1.Name = "newToolStripMenuItem1";
             this.newToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
+            this.newToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.newToolStripMenuItem1.Text = "&New";
             this.newToolStripMenuItem1.Click += new System.EventHandler(this.newToolStripMenuItem1_Click);
             // 
@@ -196,7 +210,7 @@
             // 
             this.cancelToolStripMenuItem1.Name = "cancelToolStripMenuItem1";
             this.cancelToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.cancelToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
+            this.cancelToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.cancelToolStripMenuItem1.Text = "Canc&el";
             this.cancelToolStripMenuItem1.Click += new System.EventHandler(this.cancelToolStripMenuItem1_Click);
             // 
@@ -204,7 +218,7 @@
             // 
             this.exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
             this.exitToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.X)));
-            this.exitToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
+            this.exitToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem1.Text = "E&xit";
             this.exitToolStripMenuItem1.Click += new System.EventHandler(this.exitToolStripMenuItem1_Click);
             // 
@@ -222,28 +236,6 @@
             this.showNumbersToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
             this.showNumbersToolStripMenuItem.Text = "Show numbers";
             this.showNumbersToolStripMenuItem.Click += new System.EventHandler(this.showNumbersToolStripMenuItem_Click);
-            // 
-            // gameStatusLabel
-            // 
-            this.gameStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.gameStatusLabel.Name = "gameStatusLabel";
-            this.gameStatusLabel.Size = new System.Drawing.Size(0, 17);
-            this.gameStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // boardCanvas
-            // 
-            this.boardCanvas.DataContext = null;
-            this.boardCanvas.Location = new System.Drawing.Point(14, 30);
-            this.boardCanvas.Margin = new System.Windows.Forms.Padding(10);
-            this.boardCanvas.Name = "boardCanvas";
-            this.boardCanvas.Size = new System.Drawing.Size(460, 461);
-            this.boardCanvas.TabIndex = 4;
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
             // Form1
             // 
@@ -291,7 +283,6 @@
         private System.Windows.Forms.ToolStripStatusLabel playerThink;
         private System.Windows.Forms.ToolStripMenuItem showNumbersToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel gameStatusLabel;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
 
