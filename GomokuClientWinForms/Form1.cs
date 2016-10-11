@@ -209,7 +209,7 @@ namespace GomokuClient
 
         private void showNumbersToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Not implemented !");
         }
     }
 }
